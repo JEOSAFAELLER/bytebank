@@ -1,6 +1,7 @@
 ﻿using bytebank.Modelos.Conta;
 using bytebank_ATENDIMENTO.bytebank.Exceptions;
 using Newtonsoft.Json;
+using System.Xml.Serialization;
 
 namespace bytebank_ATENDIMENTO.bytebank.Atendimento
 {
@@ -89,33 +90,71 @@ namespace bytebank_ATENDIMENTO.bytebank.Atendimento
                 Console.WriteLine("===     EXPORTAR CONTAS     ===");
                 Console.WriteLine("===============================");
                 Console.WriteLine("\n");
-
-                if (_listaDeContas.Count <= 0)
+                Console.Write("Deseja exportar por (1)Json ou (2)XML ");
+                switch (int.Parse(Console.ReadLine()))
                 {
-                    Console.WriteLine("... Não existe dados para exportação...");
-                    Console.ReadKey();
-                }
-                else
-                {
-                    string json = JsonConvert.SerializeObject(_listaDeContas,
-                        Formatting.Indented);
-                    try
-                    {
-                        FileStream fs = new FileStream(@"C:\Users\Jeosafa\source\repos\Array_Collections_C\contas.json", FileMode.Create);
-                        using (StreamWriter streamWriter = new StreamWriter(fs))
+                    case 1:
                         {
-                            streamWriter.WriteLine(json);
+                            if (_listaDeContas.Count <= 0)
+                            {
+                                Console.WriteLine("... Não existe dados para exportação...");
+                                Console.ReadKey();
+                            }
+                            else
+                            {
+                                string json = JsonConvert.SerializeObject(_listaDeContas,
+                                    Formatting.Indented);
+                                try
+                                {
+                                    FileStream fs = new FileStream(@"C:\Users\Jeosafa\source\repos\Array_Collections_C\contas.json", FileMode.Create);
+                                    using (StreamWriter streamWriter = new StreamWriter(fs))
+                                    {
+                                        streamWriter.WriteLine(json);
+                                    }
+                                    Console.WriteLine(@"Arquivo salvo");
+                                }
+                                catch (Exception excecao)
+                                {
+                                    throw new ByteBankException(excecao.Message);
+                                    Console.ReadKey();
+
+                                }
+                            }
+                            break;
                         }
-                        Console.WriteLine(@"Arquivo salvo");
-                    }
-                    catch(Exception excecao)
+                    case 2:
+                    {
+                            if (_listaDeContas.Count <= 0)
                         {
-                        throw new ByteBankException(excecao.Message);
-                        Console.ReadKey();
-
+                                Console.WriteLine("... Não existe dados para exportação...");
+                                Console.ReadKey();
+                            }
+                            else
+                        {
+                                try
+                            {
+                                    FileStream fs = new FileStream(@"C:\Users\Jeosafa\source\repos\Array_Collections_C\contas.xml", FileMode.Create);
+                                    using (StreamWriter streamWriter = new StreamWriter(fs))
+                                {
+                                        XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<ContaCorrente>));
+                                        xmlSerializer.Serialize(streamWriter, _listaDeContas);
+                                    }
+                                    Console.WriteLine(@"Arquivo salvo");
+                                    Console.ReadKey();
+                            }
+                                catch (Exception excecao)
+                            {
+                                    throw new ByteBankException(excecao.Message);
+                                    
+                                }
+                            }
+                            break;
                     }
                 }
             }
+
+
+           
         
 
         private void EncerrarAplicacao()
